@@ -1400,12 +1400,12 @@ module OpCode
     output PcShifter
   );
 
-  reg[15:0] instructionRegister=15'h0;
-  reg[5:0] CounterRegister=5'h0;
+  reg[15:0] instructionRegister=16'h0;
+  reg[5:0] CounterRegister=6'h0;
   reg pcClockHold=1'h0;
   reg pcwireshifter;
   reg [4:0] shiftIndex=5'h10;
-
+  reg [15:0]tempReg=15'h0;
   reg state=1'b0;
   reg clockon= 1'b0;
   assign PcClock =pcClockHold;
@@ -1418,10 +1418,10 @@ module OpCode
       if (rst)
       begin
         pcClockHold<=1;
-        instructionRegister<= 15'h0;
-        CounterRegister<= 5'h0;
+        instructionRegister<= 16'h0;
+        CounterRegister<= 6'h0;
         shiftIndex<= 5'h10;
-        opcoder<=15'h0;
+        opcoder<=16'h0;
         state<=1'b0;
         clockon<=0;
         pcwireshifter<=0;
@@ -1439,15 +1439,17 @@ module OpCode
           begin
 
             pcwireshifter<= 0;
-            instructionRegister <= (instructionRegister >> 1) | instructionInput<<15;
+            tempReg<= 16'h0;
+            tempReg[0]<=instructionInput;
+            instructionRegister <= (instructionRegister >> 1) | tempReg<<15;
             CounterRegister <= CounterRegister + 1;
-            if(CounterRegister == 5'h10)
+            if(CounterRegister == 6'h10)
             begin
               opcoder<=instructionRegister;
-              CounterRegister<=5'h0;
+              CounterRegister<=6'h0;
               clockon<= 1;
               state<=1'b0;
-              instructionRegister<=15'h0;
+              instructionRegister<=16'h0;
             end
           end
           else
@@ -1467,7 +1469,7 @@ module OpCode
     end
     else
     begin
-      opcoder<=15'h0;
+      opcoder<=16'h0;
       pcClockHold<=0;
     end
   end
