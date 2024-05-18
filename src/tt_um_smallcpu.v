@@ -709,7 +709,7 @@ module DIG_D_FF_AS_1bit
     assign Q = state;
     assign \~Q  = ~state;
 
-    always @ (posedge C or posedge Clr or posedge Set)
+    always @ (posedge C )
     begin
         if (Set)
             state <= 1'b1;
